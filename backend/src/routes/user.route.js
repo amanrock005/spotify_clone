@@ -1,9 +1,10 @@
 import { Router } from "express";
+import { protectRoute } from "../middlewares/auth.middleware.js";
+import { getAllUsers } from "../controllers/user.controller.js";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  res.send("user route with get method");
-});
+router.get("/", protectRoute, getAllUsers);
+// TODO: get messages
 
 export default router;
