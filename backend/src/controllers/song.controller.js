@@ -27,6 +27,7 @@ export const getFeaturedSongs = async (req, res, next) => {
     ]);
 
     res.json(songs);
+    console.log(songs);
   } catch (err) {
     next();
   }

@@ -8,7 +8,7 @@ import cors from "cors";
 import userRoutes from "./routes/user.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import authRoutes from "./routes/auth.route.js";
-import songRoutes from "./routes/auth.route.js";
+import songRoutes from "./routes/song.route.js";
 import albumRoutes from "./routes/album.route.js";
 import statRoutes from "./routes/stat.route.js";
 
@@ -62,4 +62,4 @@ app.listen(PORT, () => {
 
 // TODO: socket.io
 
-// 3:40:00
+// 5:20:00
