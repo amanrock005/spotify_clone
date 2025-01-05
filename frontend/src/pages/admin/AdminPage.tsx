@@ -1,12 +1,22 @@
 import { useAuthStore } from "@/stores/useAuthStore";
 import Header from "./components/Header";
 import DashboardStats from "./components/DashboardStats";
-import { Tabs, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { TabsList } from "@radix-ui/react-tabs";
 import { Music } from "lucide-react";
+import SongsTabContent from "./components/SongsTabContent";
+import AlbumsTabContent from "./components/AlbumsTabContent";
+import { useEffect } from "react";
+import { useMusicStore } from "@/stores/useMusicStore";
 
 export default function AdminPage() {
   const { isAdmin, isLoading } = useAuthStore();
+  const { fetchAlbums, fetchSongs, fetchStats } = useMusicStore();
+  useEffect(() => {
+    fetchAlbums();
+    fetchSongs();
+    fetchStats();
+  }, [fetchAlbums, fetchSongs, fetchStats]);
 
   if (!isAdmin && !isLoading) return <div>unauthroized</div>;
 
@@ -15,22 +25,29 @@ export default function AdminPage() {
       <Header />
       <DashboardStats />
       <Tabs defaultValue="songs" className="space-y-6">
-        <TabsList className="p-1 bg-zinc-800/50">
+        <TabsList className="p-1">
           <TabsTrigger
             value="songs"
-            className="data-[state-active]:bg-zinc-700"
+            className="data-[state=active]:bg-zinc-700"
           >
             <Music className="mr-2 size-4" />
             Songs
           </TabsTrigger>
           <TabsTrigger
             value="albums"
-            className="data-[state-active]:bg-zinc-700"
+            className="data-[state=active]:bg-zinc-700"
           >
             <Music className="mr-2 size-4" />
             Albums
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="songs">
+          <SongsTabContent />
+        </TabsContent>
+        <TabsContent value="albums">
+          <AlbumsTabContent />
+        </TabsContent>
       </Tabs>
     </div>
   );

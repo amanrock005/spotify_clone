@@ -5,7 +5,10 @@ export const getAllSongs = async (req, res, next) => {
     // -1 descending => order by desc
     // 1 ascending => orer by asc
     const songs = await Song.find().sort({ createdAt: -1 });
-  } catch (err) {}
+    res.json(songs);
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const getFeaturedSongs = async (req, res, next) => {
@@ -27,7 +30,7 @@ export const getFeaturedSongs = async (req, res, next) => {
     ]);
 
     res.json(songs);
-    console.log(songs);
+    // console.log(songs);
   } catch (err) {
     next();
   }
