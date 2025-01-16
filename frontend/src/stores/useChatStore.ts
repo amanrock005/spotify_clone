@@ -1,10 +1,10 @@
 import { axiosInstance } from "@/lib/axios";
-import { Message } from "@/types";
+import { Message, User } from "@/types";
 import { create } from "zustand";
 import { io } from "socket.io-client";
 
 interface ChatStore {
-  users: any[];
+  users: User[];
   isLoading: boolean;
   error: string | null;
   socket: any;
@@ -12,11 +12,14 @@ interface ChatStore {
   onlineUsers: Set<string>;
   userActivities: Map<string, string>;
   messages: Message[];
+  selectedUser: User | null;
 
   fetchUsers: () => Promise<void>;
   initSocket: (userId: string) => void;
   disconnectSocket: () => void;
   sendMessage: (receiverId: string, senderId: string, content: string) => void;
+  fetchMessages: (userId: string) => Promise<void>;
+  setSelectedUser: (user: User | null) => void;
 }
 
 const baseURL = "http://localhost:5000";
@@ -35,6 +38,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   onlineUsers: new Set(),
   userActivities: new Map(),
   messages: [],
+  selectedUser: null,
+
+  setSelectedUser: (user) => set({ selectedUser: user }),
 
   fetchUsers: async () => {
     set({ isLoading: true, error: null });
@@ -54,7 +60,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       socket.connect();
       socket.emit("user_connected", userId);
 
-      socket.on("user_online", (users: string[]) => {
+      socket.on("users_online", (users: string[]) => {
         set({ onlineUsers: new Set(users) });
       });
 
@@ -107,5 +113,22 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  sendMessage: async () => {},
+  sendMessage: async (receiverId, senderId, content) => {
+    const socket = get().socket;
+    if (!socket) return;
+
+    socket.emit("send_message", { receiverId, senderId, content });
+  },
+
+  fetchMessages: async (userId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axiosInstance.get(`/users/messages/${userId}`);
+      set({ messages: response.data });
+    } catch (error: any) {
+      set({ error: error.response.data.message });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 }));
